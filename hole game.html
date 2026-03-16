@@ -1,0 +1,124 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hungry Hole</title>
+<style>
+  body {
+    margin: 0;
+    text-align: center;
+    background: #222;
+    color: white;
+    font-family: Arial, sans-serif;
+  }
+
+  h1 {
+    margin: 10px;
+  }
+
+  canvas {
+    background: #333;
+    display: block;
+    margin: 0 auto;
+    border: 2px solid white;
+  }
+</style>
+</head>
+<body>
+
+<h1>🕳️ Hungry Hole</h1>
+<p>Move your mouse to eat food and grow!</p>
+
+<canvas id="gameCanvas"></canvas>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = 800;
+canvas.height = 500;
+
+// Player (hole)
+let hole = {
+  x: canvas.width / 2,
+  y: canvas.height / 2,
+  radius: 20
+};
+
+let score = 0;
+
+// Mouse movement
+canvas.addEventListener("mousemove", (e) => {
+  const rect = canvas.getBoundingClientRect();
+  hole.x = e.clientX - rect.left;
+  hole.y = e.clientY - rect.top;
+});
+
+// Food array
+let foods = [];
+
+// Spawn food
+function spawnFood() {
+  let size = Math.random() * 8 + 5;
+
+  foods.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    radius: size
+  });
+}
+
+// Create starting food
+for (let i = 0; i < 25; i++) {
+  spawnFood();
+}
+
+// Game loop
+function update() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw hole
+  ctx.beginPath();
+  ctx.arc(hole.x, hole.y, hole.radius, 0, Math.PI * 2);
+  ctx.fillStyle = "black";
+  ctx.fill();
+
+  // Draw foods
+  for (let i = foods.length - 1; i >= 0; i--) {
+    let food = foods[i];
+
+    ctx.beginPath();
+    ctx.arc(food.x, food.y, food.radius, 0, Math.PI * 2);
+    ctx.fillStyle = "lime";
+    ctx.fill();
+
+    // Distance check
+    let dx = hole.x - food.x;
+    let dy = hole.y - food.y;
+    let distance = Math.sqrt(dx * dx + dy * dy);
+
+    // Eat food if big enough
+    if (distance < hole.radius && hole.radius > food.radius) {
+      foods.splice(i, 1);
+      hole.radius += 0.6;
+      score += 1;
+      spawnFood();
+    }
+  }
+
+  // Draw score
+  ctx.fillStyle = "white";
+  ctx.font = "20px Arial";
+  ctx.fillText("Score: " + score, 10, 25);
+
+  requestAnimationFrame(update);
+}
+
+// Start game
+update();
+</script>
+
+</body>
+</html>
+```
